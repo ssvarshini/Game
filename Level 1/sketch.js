@@ -4,6 +4,10 @@ var boy1Up;
 var boy1Down;
 var proteinShakes = []; // Array to hold protein shakes
 var healthbar = 0;
+var lifeStages = []; // Array to hold life stages
+var orcs = []; // Array to hold Orc instances
+var lives = 3; // Number of lives
+var gameOver = false; // Flag to check if the game is over
 
 function setup() {    
     createCanvas(1437, 780);
@@ -30,23 +34,39 @@ function setup() {
     scene = new Scene(colors);
     boy = new Boy(253, 250, colors);
     knight = new Knight(150, 150, colors);
-    orc = new Orc(width / 2, height / 2);
     
+    // Initialize Orcs with fixed positions
+    orcs.push(new Orc(300,700)); // Orc 1
+    orcs.push(new Orc(400, 250)); // Orc 2
+    orcs.push(new Orc(500, 300)); // Orc 3
+    orcs.push(new Orc(600, 400)); // Orc 4
+    orcs.push(new Orc(1000, 400)); // Orc 5
+
     // Initialize protein shakes in the array with different positions
-    proteinShakes.push(new ProteinShake(200, 300 )); // Position 1
-    proteinShakes.push(new ProteinShake(400, 400 )); // Position 2
-    proteinShakes.push(new ProteinShake(600, 200 )); // Position 3
-    proteinShakes.push(new ProteinShake(1350, 500)); // Position 4
-    proteinShakes.push(new ProteinShake(250, 600)); // Position 5
-    proteinShakes.push(new ProteinShake(1350, 19 )); // Position 6
+    proteinShakes.push(new ProteinShake(200, 300)); // Position 1
+    proteinShakes.push(new ProteinShake(600, 200)); // Position 2
+    proteinShakes.push(new ProteinShake(1350, 500)); // Position 3
+    proteinShakes.push(new ProteinShake(250, 600)); // Position 4
+    proteinShakes.push(new ProteinShake(1350, 19));// Position 5
+    proteinShakes.push(new ProteinShake(1300, 300)); // Position 6
+    proteinShakes.push(new ProteinShake(1200, 250)); // Position 7
+    proteinShakes.push(new ProteinShake(900, 350)); // Position 8
+    // Initialize life stages
+    for (let i = 0; i < 3; i++) {
+        lifeStages.push(new LifeStage(50 + i * 40, 50)); // Adjust position as needed
+    }
 }
 
 function draw() {
+    if (gameOver) {
+        displayGameOver();
+        return;
+    }
+    
     // Draw Scene, Boy, and Knight
     scene.draw();
     boy.draw();
     knight.draw();
-    orc.drawOrc(); 
 
     // Draw all protein shakes
     for (let shake of proteinShakes) {
@@ -70,8 +90,29 @@ function draw() {
     // Check for protein shake collection
     boy.checkCollection(proteinShakes);
     
-   drawHealthBar();
+    // Draw life stages
+    for (let i = 0; i < lifeStages.length; i++) {
+        lifeStages[i].draw(lives > i, lives === i); // Fill heart if lives are above the threshold, break if it just lost
+    }
     
+    // Draw all Orcs and check for collision with the boy
+    for (let orc of orcs) {
+        orc.drawOrc();
+        if (boy.checkCollision(orc)) {
+            loseLife();
+        }
+    }
+
+    // Draw the health bar
+    drawHealthBar();
+
+    // Check if the health bar is full and display level up message
+    if (healthbar === 100) {
+        fill(0, 255, 0); // Green color for success
+        textSize(48);
+        textAlign(CENTER, CENTER);
+        text("Yay, proceed to level 2!", width / 2, height / 2);
+    }
 }
 
 // Method to draw the health bar
@@ -80,6 +121,57 @@ function drawHealthBar() {
     rect(20, 20, 200, 20); // Background of the health bar
     fill(0, 255, 0); // Green color for the health
     rect(20, 20, healthbar * 2, 20); // Health bar (width increases based on health)
+}
+
+// Method to display game over
+function displayGameOver() {
+    background(0);
+    fill(255, 0, 0);
+    textSize(64);
+    textAlign(CENTER, CENTER);
+    text("Game Over", width / 2, height / 2);
+}
+
+// Method to handle losing a life
+function loseLife() {
+    lives--;
+    if (lives <= 0) {
+        gameOver = true;
+    }
+    boy.resetPosition(); // Reset boy's position after losing a life
+}
+
+// LifeStage Class
+class LifeStage {
+    constructor(x, y) {
+        this.x = x; // X position for the heart
+        this.y = y; // Y position for the heart
+        this.size = 30; // Size of the heart
+    }
+
+    draw(isFilled, isBreaking) {
+        if (isBreaking) {
+            fill(200, 0, 0); // Darker red for broken heart
+            beginShape();
+            vertex(this.x, this.y);
+            bezierVertex(this.x - this.size / 2, this.y - this.size / 2, this.x - this.size, this.y + this.size / 2, this.x, this.y + this.size);
+            bezierVertex(this.x + this.size, this.y + this.size / 2, this.x + this.size / 2, this.y - this.size / 2, this.x, this.y);
+            endShape(CLOSE);
+            // Draw a break line
+            stroke(0);
+            strokeWeight(2);
+            line(this.x - this.size / 4, this.y - this.size / 4, this.x + this.size / 4, this.y + this.size / 4);
+            line(this.x + this.size / 4, this.y - this.size / 4, this.x - this.size / 4, this.y + this.size / 4);
+            noStroke();
+        } else {
+            fill(isFilled ? color(255, 0, 0) : color(200, 0, 0)); // Red for filled, dark red for empty
+            beginShape();
+            vertex(this.x, this.y);
+            bezierVertex(this.x - this.size / 2, this.y - this.size / 2, this.x - this.size, this.y + this.size / 2, this.x, this.y + this.size);
+            bezierVertex(this.x + this.size, this.y + this.size / 2, this.x + this.size / 2, this.y - this.size / 2, this.x, this.y);
+            endShape(CLOSE);
+        }
+    }
 }
 
 // Scene Constructor Function
@@ -124,7 +216,7 @@ class Scene {
         rect(1120, 500, 200, 30, 20);
 
         // Center structures
-        rect(470, 390, 30, 205,  20 ); // Centre 1
+        rect(470, 390, 30, 205, 20); // Centre 1
         rect(490, 450, 100, 30, 20);
 
         rect(940, 390, 30, 205, 20); // Centre 2
@@ -137,11 +229,12 @@ class Scene {
     }
 }
 
-
 class Boy {
     constructor(x, y, colors) {
         this.anchorX = x / 0.5; 
         this.anchorY = y / 0.5;
+        this.startX = this.anchorX; // Store initial position
+        this.startY = this.anchorY;
         this.colors = colors;
     }
 
@@ -173,7 +266,7 @@ class Boy {
         arc(this.anchorX, this.anchorY - 30, 30, 20, 0, PI);
 
         // Hands
-        fill(this.colors.white);
+        fill(this.colors .white);
         ellipse(this.anchorX - 33, this.anchorY + 30, 20, 20);
         ellipse(this.anchorX + 32, this.anchorY + 30, 20, 20);
 
@@ -192,32 +285,39 @@ class Boy {
         pop(); // Restore the transformation matrix
     }
 
-   
     move(xChange, yChange) {
         this.anchorX += xChange * 2; 
         this.anchorY += yChange * 2;
     }
     
     checkCollection(proteinShakes) {
-    
-    let scaledX = this.anchorX * 0.5;
-    let scaledY = this.anchorY * 0.5;
+        let scaledX = this.anchorX * 0.5;
+        let scaledY = this.anchorY * 0.5;
 
-    for (let i = proteinShakes.length - 1; i >= 0; i--) {
-        let shake = proteinShakes[i];
-        let distance = dist(scaledX, scaledY, shake.shakeX, shake.shakeY);
-        
-       
-        if (distance < 50) {
-            proteinShakes.splice(i, 1); 
-            healthbar += 10; 
-            if (healthbar > 100) healthbar = 100; 
+        for (let i = proteinShakes.length - 1; i >= 0; i--) {
+            let shake = proteinShakes[i];
+            let distance = dist(scaledX, scaledY, shake.shakeX, shake.shakeY);
+            
+            if (distance < 50) {
+                proteinShakes.splice(i, 1); 
+                healthbar += 20; 
+                if (healthbar > 100) healthbar = 100; 
+            }
         }
     }
-}
 
-}
+    checkCollision(orc) {
+        let scaledX = this.anchorX * 0.5;
+        let scaledY = this.anchorY * 0.5;
+        let distance = dist(scaledX, scaledY, orc.orcX, orc.orcY);
+        return distance < 50;
+    }
 
+    resetPosition() {
+        this.anchorX = this.startX;
+        this.anchorY = this.startY;
+    }
+}
 
 // Knight Constructor Function
 class Knight {
@@ -332,19 +432,13 @@ class ProteinShake {
         fill(255); // Straw
         rect(this.shakeX + 15, this.shakeY - 15, 3, 15);
     }
-
 }
-
-
-
 
 // Orc Class
 class Orc {
     constructor(x, y) {
         this.orcX = x;
         this.orcY = y;
-        
-       
         this.proteinShake = new ProteinShake(this.orcX + 60, this.orcY - 40);
     }
 
@@ -357,82 +451,77 @@ class Orc {
         this.drawOrcLoinclothAndArmor();
         this.drawOrcArmsAndClub();
         this.drawOrcLegsAndFeet();
-
-       
     }
 
     drawOrcBody() {
         fill(34, 139, 34); // Green color for the orc skin
-        rect(this.orcX - 30, this.orcY - 30, 60, 80, 10);
+        rect(this.orcX - 15, this.orcY - 15, 30, 40, 5); // Smaller body
     }
 
     drawOrcHead() {
-        stroke(0);
         fill(34, 139, 34);
-        ellipse(this.orcX, this.orcY - 60, 60, 50); // Head above the body
+        ellipse(this.orcX, this.orcY - 27, 30, 25); // Smaller head
     }
 
     drawOrcScar() {
-        strokeWeight(3);
+        strokeWeight(2); // Adjusted stroke for smaller size
         stroke(200, 15, 80, 200); // Darker red color for a more pronounced scar
-        line(this.orcX + 5, this.orcY - 75, this.orcX + 25, this.orcY - 55);
+        line(this.orcX + 2, this.orcY - 37, this.orcX + 12, this.orcY - 27); // Adjusted position
     }
 
     drawOrcEyes() {
         fill(0);
         beginShape();
-        vertex(this.orcX - 15, this.orcY - 70);
-        vertex(this.orcX - 5, this.orcY - 67);
-        vertex(this.orcX - 15, this.orcY - 65);
+        vertex(this.orcX - 7, this.orcY - 35);
+        vertex(this.orcX - 2, this.orcY - 33);
+        vertex(this.orcX - 7, this.orcY - 32);
         endShape(CLOSE);
 
         beginShape();
-        vertex(this.orcX + 5, this.orcY - 70);
-        vertex(this.orcX + 15, this.orcY - 67);
-        vertex(this.orcX + 5, this.orcY - 65);
+        vertex(this.orcX + 2, this.orcY - 35);
+        vertex(this.orcX + 7, this.orcY - 33);
+        vertex(this.orcX + 2, this.orcY - 32);
         endShape(CLOSE);
 
         fill(255, 0, 0); // Red pupils
-        ellipse(this.orcX - 10, this.orcY - 68, 4, 2);
-        ellipse(this.orcX + 10, this.orcY - 68, 4, 2);
+        ellipse(this.orcX - 5, this.orcY - 34, 2, 1); // Smaller pupils
+        ellipse(this.orcX + 5, this.orcY - 34, 2, 1);
     }
 
     drawOrcMouth() {
         fill(255); // Fangs
-        triangle(this.orcX - 8, this.orcY - 52, this.orcX - 3, this.orcY - 42, this.orcX - 13, this.orcY - 42);
-        triangle(this.orcX + 8, this.orcY - 52, this.orcX + 13, this.orcY - 42, this.orcX + 3, this.orcY - 42);
+        triangle(this.orcX - 4, this.orcY - 26, this.orcX -  2, this.orcY - 21, this.orcX - 6, this.orcY - 21);
+        triangle(this.orcX + 4, this.orcY - 26, this.orcX + 6, this.orcY - 21, this.orcX + 2, this.orcY - 21);
 
         stroke(0);
         strokeWeight(1);
         fill(0);
-        arc(this.orcX, this.orcY - 47, 30, 15, 0, PI, OPEN); // Mouth
+        arc(this.orcX, this.orcY - 23, 15, 7, 0, PI, OPEN); // Smaller mouth
     }
 
     drawOrcLoinclothAndArmor() {
         fill(169, 169, 169); // Gray shoulder armor
-        arc(this.orcX - 32, this.orcY - 20, 35, 25, PI, 0, CHORD);
-        arc(this.orcX + 32, this.orcY - 20, 35, 25, PI, 0, CHORD);
+        arc(this.orcX - 16, this.orcY - 10, 18, 12, PI, 0, CHORD); // Adjusted size
+        arc(this.orcX + 16, this.orcY - 10, 18, 12, PI, 0, CHORD);
     }
 
     drawOrcArmsAndClub() {
         fill(34, 139, 34); // Green arms
-        rect(this.orcX - 50, this.orcY - 20, 20, 50); // Left hand
-        rect(this.orcX + 30, this.orcY - 20, 20, 50); // Right hand
+        rect(this.orcX - 25, this.orcY - 10, 10, 25); // Smaller left hand
+        rect(this.orcX + 15, this.orcY - 10, 10, 25); // Smaller right hand
 
         fill(139, 69, 19); // Brown color for club
-        rect(this.orcX - 45, this.orcY - 10, 10, 60, 5); // Club handle
-        ellipse(this.orcX - 43, this.orcY + 60, 30, 40); // Club head
+        rect(this.orcX - 22, this.orcY - 5, 5, 30, 2); // Smaller club handle
+        ellipse(this.orcX - 21, this.orcY + 30, 15, 20); // Smaller club head
     }
 
     drawOrcLegsAndFeet() {
         fill(34, 139, 34); // Green legs
-        rect(this.orcX - 30, this.orcY + 50, 18, 35, 5);
-        rect(this.orcX + 12, this.orcY + 50, 18, 35, 5);
+        rect(this.orcX - 15, this.orcY + 25, 9, 18, 2.5); // Smaller left leg
+        rect(this.orcX + 6, this.orcY + 25, 9, 18, 2.5); // Smaller right leg
 
         // Feet
-        arc(this.orcX - 20, this.orcY + 90, 25, 12, PI, 0, CHORD);
-        arc(this.orcX + 20, this.orcY + 90, 25, 12, PI, 0, CHORD);
+        arc(this.orcX - 10, this.orcY + 45, 12, 6, PI, 0, CHORD); // Smaller feet
+        arc(this.orcX + 10, this.orcY + 45, 12, 6, PI, 0, CHORD);
     }
-
-
 }
