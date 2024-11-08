@@ -143,10 +143,17 @@ class Knight {
 }
  */
 
-
+var boy1Left;
+var boy1Right;
+var boy1Up;
+var boy1Down;
 
  function setup() {    
     createCanvas(1437, 780);
+    boy1Left = false;
+    boy1Right = false;
+    boy1Up = false;
+    boy1Down = false;
     
     // Colors
     const colors = {
@@ -166,7 +173,7 @@ class Knight {
     scene = new Scene(colors);
     boy = new Boy(253, 250, colors);
     knight = new Knight(150, 150, colors);
-    orc = new Orc(width / 2, height / 2);
+    //orc = new Orc(width / 2, height / 2);
 }
 
 function draw() {
@@ -174,7 +181,22 @@ function draw() {
     scene.draw();
     boy.draw();
     knight.draw();
-    orc.drawOrc(); 
+    //orc.drawOrc(); 
+
+    // Move Boy character based on arrow key flags
+    if (boy1Left) {
+        boy.move(-9, 0); // Move left
+    }
+    if (boy1Right) {
+        boy.move(9, 0); // Move right
+    }
+    if (boy1Up) {
+        boy.move(0, -9); // Move up
+    }
+    if (boy1Down) {
+        boy.move(0, 9); // Move down
+    }
+        
 }
 
 // Scene Constructor Function
@@ -280,6 +302,14 @@ class Boy {
         ellipse(this.anchorX - 73, this.anchorY+12, 40, 60);
         ellipse(this.anchorX + 67, this.anchorY+12, 40, 60);
     }
+
+    // Method to move the Boy
+    move(xChange, yChange) {
+        this.anchorX += xChange;
+        this.anchorY += yChange;
+    }
+
+   
 }
 
 // Knight Constructor Function
@@ -338,12 +368,45 @@ class Knight {
         rect(this.anchorX - 30, this.anchorY + 70, 27, 10);
         rect(this.anchorX + 5, this.anchorY + 70, 27, 10);
     }
+
+    
+}
+
+function keyPressed() {
+    // Arrow keys for the Boy
+    if (keyCode === LEFT_ARROW) {
+        boy1Left = true;
+    }
+    if (keyCode === RIGHT_ARROW) {
+        boy1Right = true;
+    }
+    if (keyCode === UP_ARROW) {
+        boy1Up = true;
+    }
+    if (keyCode === DOWN_ARROW) {
+        boy1Down = true;
+    }
+
+}
+
+function keyReleased() {
+    if (keyCode === LEFT_ARROW) {
+        boy1Left = false;
+    }
+    if (keyCode === RIGHT_ARROW) {
+        boy1Right = false;
+    }
+    if (keyCode === UP_ARROW) {
+        boy1Up = false;
+    }
+    if (keyCode === DOWN_ARROW) {
+        boy1Down = false;
+    }
 }
 
 
 
-
-class Orc {
+/* class Orc {
     constructor(x, y) {
         // Properties for the Orc's position
         this.orcX = x;
@@ -454,5 +517,5 @@ class Orc {
     //     rect(this.shakeX + 15, this.shakeY - 15, 3, 15); // Straw
     // }
 }
-
+ */
  
