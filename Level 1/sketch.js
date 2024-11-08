@@ -235,8 +235,8 @@ class Scene {
 // Boy Constructor Function
 class Boy {
     constructor(x, y, colors) {
-        this.anchorX = x;
-        this.anchorY = y;
+        this.anchorX = x-130;
+        this.anchorY = y+430;
         this.colors = colors;
     }
 
