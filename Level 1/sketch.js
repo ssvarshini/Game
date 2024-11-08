@@ -3,6 +3,7 @@ var boy1Right;
 var boy1Up;
 var boy1Down;
 var proteinShakes = []; // Array to hold protein shakes
+var collectedShakes = 0;
 
 function setup() {    
     createCanvas(1437, 780);
@@ -29,14 +30,15 @@ function setup() {
     scene = new Scene(colors);
     boy = new Boy(253, 250, colors);
     knight = new Knight(150, 150, colors);
+    orc = new Orc(width / 2, height / 2);
     
     // Initialize protein shakes in the array with different positions
-    proteinShakes.push(new ProteinShake(200, 300)); // Position 1
-    proteinShakes.push(new ProteinShake(400, 400)); // Position 2
-    proteinShakes.push(new ProteinShake(600, 200)); // Position 3
+    proteinShakes.push(new ProteinShake(200, 300 )); // Position 1
+    proteinShakes.push(new ProteinShake(400, 400 )); // Position 2
+    proteinShakes.push(new ProteinShake(600, 200 )); // Position 3
     proteinShakes.push(new ProteinShake(1350, 500)); // Position 4
     proteinShakes.push(new ProteinShake(250, 600)); // Position 5
-    proteinShakes.push(new ProteinShake(1350, 190)); // Position 5
+    proteinShakes.push(new ProteinShake(1350, 19 )); // Position 5
 }
 
 function draw() {
@@ -44,6 +46,7 @@ function draw() {
     scene.draw();
     boy.draw();
     knight.draw();
+    orc.drawOrc(); 
 
     // Draw all protein shakes
     for (let shake of proteinShakes) {
@@ -63,6 +66,14 @@ function draw() {
     if (boy1Down) {
         boy.move(0, 9); // Move down
     }   
+
+    // Check for protein shake collection
+    boy.checkCollection(proteinShakes);
+    
+    // Display collected shakes count
+    fill(0);
+    textSize(20);
+    text("Shakes Collected: " + collectedShakes, 20, 30);
 }
 
 // Scene Constructor Function
@@ -120,7 +131,7 @@ class Scene {
     }
 }
 
-// Boy Constructor Function
+/* // Boy Constructor Function
 class Boy {
     constructor(x, y, colors) {
         this.anchorX = x / 0.5; // Adjust by the scale factor
@@ -180,7 +191,111 @@ class Boy {
         this.anchorX += xChange * 2; // Adjust movement to match scale factor
         this.anchorY += yChange * 2;
     }
+
+    // Method to check collection of protein shakes
+    checkCollection(proteinShakes) {
+        for (let i = proteinShakes.length - 1; i >= 0; i--) {
+            let shake = proteinShakes[i];
+            let distance = dist(this.anchorX, this.anchorY, shake.shakeX, shake.shakeY);
+            
+            // If distance is less than threshold, collect the shake
+            if (distance < 50) {
+                proteinShakes.splice(i, 1); // Remove shake from array
+                collectedShakes++; // Increment collected count
+            }
+        }
+    }
 }
+ */
+
+
+
+// Update the Boy class with a checkCollection method
+class Boy {
+    constructor(x, y, colors) {
+        this.anchorX = x / 0.5; // Adjust by the scale factor
+        this.anchorY = y / 0.5;
+        this.colors = colors;
+    }
+
+    draw() {
+        push(); // Start a new transformation matrix
+        scale(0.5); // Scale down to 50% of the original size
+
+        // Anchor Point
+        fill(this.colors.red);
+        ellipse(this.anchorX, this.anchorY, 20, 20);
+
+        // Body
+        fill(this.colors.black);
+        rect(this.anchorX - 28, this.anchorY + 1, 55, 80, 20);
+
+        // Head
+        fill(this.colors.white);
+        ellipse(this.anchorX, this.anchorY - 40, 80, 80);
+
+        // Eyes
+        fill(this.colors.black);
+        ellipse(this.anchorX - 15, this.anchorY - 55, 10, 10);
+        ellipse(this.anchorX + 15, this.anchorY - 55, 10, 10);
+
+        // Smile
+        noFill();
+        stroke(this.colors.black);
+        strokeWeight(2);
+        arc(this.anchorX, this.anchorY - 30, 30, 20, 0, PI);
+
+        // Hands
+        fill(this.colors.white);
+        ellipse(this.anchorX - 33, this.anchorY + 30, 20, 20);
+        ellipse(this.anchorX + 32, this.anchorY + 30, 20, 20);
+
+        // Feet
+        fill(this.colors.red);
+        rect(this.anchorX - 23, this.anchorY + 75, 20, 10);
+        rect(this.anchorX + 2, this.anchorY + 75, 20, 10);
+
+        // Dumbbell
+        fill(this.colors.darkRed);
+        rect(this.anchorX - 53, this.anchorY + 10, 100, 20, 5);
+        fill(50);
+        ellipse(this.anchorX - 73, this.anchorY + 12, 40, 60);
+        ellipse(this.anchorX + 67, this.anchorY + 12, 40, 60);
+
+        pop(); // Restore the transformation matrix
+    }
+
+    // Method to move the Boy
+    move(xChange, yChange) {
+        this.anchorX += xChange * 2; // Adjust movement to match scale factor
+        this.anchorY += yChange * 2;
+    }
+
+    // Method to check collection of protein shakes
+    checkCollection(proteinShakes) {
+        // Scaled positions for accurate collision detection
+        let scaledX = this.anchorX * 0.5;
+        let scaledY = this.anchorY * 0.5;
+
+        for (let i = proteinShakes.length - 1; i >= 0; i--) {
+            let shake = proteinShakes[i];
+            let distance = dist(scaledX, scaledY, shake.shakeX, shake.shakeY);
+            
+            // If distance is less than threshold, collect the shake
+            if (distance < 50) {
+                proteinShakes.splice(i, 1); // Remove shake from array
+                collectedShakes++; // Increment collected count
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
 
 // Knight Constructor Function
 class Knight {
@@ -296,9 +411,112 @@ class ProteinShake {
         rect(this.shakeX + 15, this.shakeY - 15, 3, 15);
     }
 
-    // Method to update position, if needed
+    /* // Method to update position, if needed
     setPosition(x, y) {
         this.shakeX = x;
         this.shakeY = y;
+    } */
+}
+
+
+
+
+// Orc Class
+class Orc {
+    constructor(x, y) {
+        this.orcX = x;
+        this.orcY = y;
+        
+        // Initialize ProteinShake positioned relative to the orc
+        this.proteinShake = new ProteinShake(this.orcX + 60, this.orcY - 40);
     }
+
+    drawOrc() {
+        this.drawOrcBody();
+        this.drawOrcHead();
+        this.drawOrcScar();
+        this.drawOrcEyes();
+        this.drawOrcMouth();
+        this.drawOrcLoinclothAndArmor();
+        this.drawOrcArmsAndClub();
+        this.drawOrcLegsAndFeet();
+
+        // Draw the protein shake
+        this.proteinShake.draw();
+    }
+
+    drawOrcBody() {
+        fill(34, 139, 34); // Green color for the orc skin
+        rect(this.orcX - 30, this.orcY - 30, 60, 80, 10);
+    }
+
+    drawOrcHead() {
+        stroke(0);
+        fill(34, 139, 34);
+        ellipse(this.orcX, this.orcY - 60, 60, 50); // Head above the body
+    }
+
+    drawOrcScar() {
+        strokeWeight(3);
+        stroke(200, 15, 80, 200); // Darker red color for a more pronounced scar
+        line(this.orcX + 5, this.orcY - 75, this.orcX + 25, this.orcY - 55);
+    }
+
+    drawOrcEyes() {
+        fill(0);
+        beginShape();
+        vertex(this.orcX - 15, this.orcY - 70);
+        vertex(this.orcX - 5, this.orcY - 67);
+        vertex(this.orcX - 15, this.orcY - 65);
+        endShape(CLOSE);
+
+        beginShape();
+        vertex(this.orcX + 5, this.orcY - 70);
+        vertex(this.orcX + 15, this.orcY - 67);
+        vertex(this.orcX + 5, this.orcY - 65);
+        endShape(CLOSE);
+
+        fill(255, 0, 0); // Red pupils
+        ellipse(this.orcX - 10, this.orcY - 68, 4, 2);
+        ellipse(this.orcX + 10, this.orcY - 68, 4, 2);
+    }
+
+    drawOrcMouth() {
+        fill(255); // Fangs
+        triangle(this.orcX - 8, this.orcY - 52, this.orcX - 3, this.orcY - 42, this.orcX - 13, this.orcY - 42);
+        triangle(this.orcX + 8, this.orcY - 52, this.orcX + 13, this.orcY - 42, this.orcX + 3, this.orcY - 42);
+
+        stroke(0);
+        strokeWeight(1);
+        fill(0);
+        arc(this.orcX, this.orcY - 47, 30, 15, 0, PI, OPEN); // Mouth
+    }
+
+    drawOrcLoinclothAndArmor() {
+        fill(169, 169, 169); // Gray shoulder armor
+        arc(this.orcX - 32, this.orcY - 20, 35, 25, PI, 0, CHORD);
+        arc(this.orcX + 32, this.orcY - 20, 35, 25, PI, 0, CHORD);
+    }
+
+    drawOrcArmsAndClub() {
+        fill(34, 139, 34); // Green arms
+        rect(this.orcX - 50, this.orcY - 20, 20, 50); // Left hand
+        rect(this.orcX + 30, this.orcY - 20, 20, 50); // Right hand
+
+        fill(139, 69, 19); // Brown color for club
+        rect(this.orcX - 45, this.orcY - 10, 10, 60, 5); // Club handle
+        ellipse(this.orcX - 43, this.orcY + 60, 30, 40); // Club head
+    }
+
+    drawOrcLegsAndFeet() {
+        fill(34, 139, 34); // Green legs
+        rect(this.orcX - 30, this.orcY + 50, 18, 35, 5);
+        rect(this.orcX + 12, this.orcY + 50, 18, 35, 5);
+
+        // Feet
+        arc(this.orcX - 20, this.orcY + 90, 25, 12, PI, 0, CHORD);
+        arc(this.orcX + 20, this.orcY + 90, 25, 12, PI, 0, CHORD);
+    }
+
+
 }
