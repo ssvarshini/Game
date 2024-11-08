@@ -13,6 +13,8 @@ function setup() {
     shakeY = orcY - 40;
 }
 
+// Akash is cutie pie
+
 function draw() {
     background(220); // Clear the background on each frame to avoid trails
 
