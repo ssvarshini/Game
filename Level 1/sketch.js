@@ -3,7 +3,7 @@ var boy1Right;
 var boy1Up;
 var boy1Down;
 var proteinShakes = []; // Array to hold protein shakes
-var collectedShakes = 0;
+var healthbar = 0;
 
 function setup() {    
     createCanvas(1437, 780);
@@ -70,10 +70,16 @@ function draw() {
     // Check for protein shake collection
     boy.checkCollection(proteinShakes);
     
-    // Display collected shakes count
-    fill(0);
-    textSize(20);
-    text("Shakes Collected: " + collectedShakes, 20, 30);
+   drawHealthBar();
+    
+}
+
+// Method to draw the health bar
+function drawHealthBar() {
+    fill(255, 0, 0); // Red color for the health bar
+    rect(20, 20, 200, 20); // Background of the health bar
+    fill(0, 255, 0); // Green color for the health
+    rect(20, 20, healthbar * 2, 20); // Health bar (width increases based on health)
 }
 
 // Scene Constructor Function
@@ -131,17 +137,17 @@ class Scene {
     }
 }
 
-/* // Boy Constructor Function
+
 class Boy {
     constructor(x, y, colors) {
-        this.anchorX = x / 0.5; // Adjust by the scale factor
+        this.anchorX = x / 0.5; 
         this.anchorY = y / 0.5;
         this.colors = colors;
     }
 
     draw() {
-        push(); // Start a new transformation matrix
-        scale(0.5); // Scale down to 50% of the original size
+        push(); 
+        scale(0.5); 
 
         // Anchor Point
         fill(this.colors.red);
@@ -186,115 +192,31 @@ class Boy {
         pop(); // Restore the transformation matrix
     }
 
-    // Method to move the Boy
+   
     move(xChange, yChange) {
-        this.anchorX += xChange * 2; // Adjust movement to match scale factor
+        this.anchorX += xChange * 2; 
         this.anchorY += yChange * 2;
     }
-
-    // Method to check collection of protein shakes
+    
     checkCollection(proteinShakes) {
-        for (let i = proteinShakes.length - 1; i >= 0; i--) {
-            let shake = proteinShakes[i];
-            let distance = dist(this.anchorX, this.anchorY, shake.shakeX, shake.shakeY);
-            
-            // If distance is less than threshold, collect the shake
-            if (distance < 50) {
-                proteinShakes.splice(i, 1); // Remove shake from array
-                collectedShakes++; // Increment collected count
-            }
-        }
-    }
-}
- */
+    
+    let scaledX = this.anchorX * 0.5;
+    let scaledY = this.anchorY * 0.5;
 
-
-
-// Update the Boy class with a checkCollection method
-class Boy {
-    constructor(x, y, colors) {
-        this.anchorX = x / 0.5; // Adjust by the scale factor
-        this.anchorY = y / 0.5;
-        this.colors = colors;
-    }
-
-    draw() {
-        push(); // Start a new transformation matrix
-        scale(0.5); // Scale down to 50% of the original size
-
-        // Anchor Point
-        fill(this.colors.red);
-        ellipse(this.anchorX, this.anchorY, 20, 20);
-
-        // Body
-        fill(this.colors.black);
-        rect(this.anchorX - 28, this.anchorY + 1, 55, 80, 20);
-
-        // Head
-        fill(this.colors.white);
-        ellipse(this.anchorX, this.anchorY - 40, 80, 80);
-
-        // Eyes
-        fill(this.colors.black);
-        ellipse(this.anchorX - 15, this.anchorY - 55, 10, 10);
-        ellipse(this.anchorX + 15, this.anchorY - 55, 10, 10);
-
-        // Smile
-        noFill();
-        stroke(this.colors.black);
-        strokeWeight(2);
-        arc(this.anchorX, this.anchorY - 30, 30, 20, 0, PI);
-
-        // Hands
-        fill(this.colors.white);
-        ellipse(this.anchorX - 33, this.anchorY + 30, 20, 20);
-        ellipse(this.anchorX + 32, this.anchorY + 30, 20, 20);
-
-        // Feet
-        fill(this.colors.red);
-        rect(this.anchorX - 23, this.anchorY + 75, 20, 10);
-        rect(this.anchorX + 2, this.anchorY + 75, 20, 10);
-
-        // Dumbbell
-        fill(this.colors.darkRed);
-        rect(this.anchorX - 53, this.anchorY + 10, 100, 20, 5);
-        fill(50);
-        ellipse(this.anchorX - 73, this.anchorY + 12, 40, 60);
-        ellipse(this.anchorX + 67, this.anchorY + 12, 40, 60);
-
-        pop(); // Restore the transformation matrix
-    }
-
-    // Method to move the Boy
-    move(xChange, yChange) {
-        this.anchorX += xChange * 2; // Adjust movement to match scale factor
-        this.anchorY += yChange * 2;
-    }
-
-    // Method to check collection of protein shakes
-    checkCollection(proteinShakes) {
-        // Scaled positions for accurate collision detection
-        let scaledX = this.anchorX * 0.5;
-        let scaledY = this.anchorY * 0.5;
-
-        for (let i = proteinShakes.length - 1; i >= 0; i--) {
-            let shake = proteinShakes[i];
-            let distance = dist(scaledX, scaledY, shake.shakeX, shake.shakeY);
-            
-            // If distance is less than threshold, collect the shake
-            if (distance < 50) {
-                proteinShakes.splice(i, 1); // Remove shake from array
-                collectedShakes++; // Increment collected count
-            }
+    for (let i = proteinShakes.length - 1; i >= 0; i--) {
+        let shake = proteinShakes[i];
+        let distance = dist(scaledX, scaledY, shake.shakeX, shake.shakeY);
+        
+       
+        if (distance < 50) {
+            proteinShakes.splice(i, 1); 
+            healthbar += 10; 
+            if (healthbar > 100) healthbar = 100; 
         }
     }
 }
 
-
-
-
-
-
+}
 
 
 // Knight Constructor Function
@@ -411,11 +333,6 @@ class ProteinShake {
         rect(this.shakeX + 15, this.shakeY - 15, 3, 15);
     }
 
-    /* // Method to update position, if needed
-    setPosition(x, y) {
-        this.shakeX = x;
-        this.shakeY = y;
-    } */
 }
 
 
@@ -427,7 +344,7 @@ class Orc {
         this.orcX = x;
         this.orcY = y;
         
-        // Initialize ProteinShake positioned relative to the orc
+       
         this.proteinShake = new ProteinShake(this.orcX + 60, this.orcY - 40);
     }
 
@@ -441,8 +358,7 @@ class Orc {
         this.drawOrcArmsAndClub();
         this.drawOrcLegsAndFeet();
 
-        // Draw the protein shake
-        this.proteinShake.draw();
+       
     }
 
     drawOrcBody() {
