@@ -38,7 +38,7 @@ function setup() {
     proteinShakes.push(new ProteinShake(600, 200 )); // Position 3
     proteinShakes.push(new ProteinShake(1350, 500)); // Position 4
     proteinShakes.push(new ProteinShake(250, 600)); // Position 5
-    proteinShakes.push(new ProteinShake(1350, 19 )); // Position 5
+    proteinShakes.push(new ProteinShake(1350, 19 )); // Position 6
 }
 
 function draw() {
@@ -331,7 +331,7 @@ class Knight {
         rect(this.anchorX - 35, this.anchorY - 40, 70, 90, 5);
         fill(this.colors.darkSilver);
         rect(this.anchorX - 35, this.anchorY - 30, 70, 5);
- fill(this.colors.gold);
+        fill(this.colors.gold);
         rect(this.anchorX - 35, this.anchorY - 40, 5, 90);
         rect(this.anchorX + 30, this.anchorY - 40, 5, 90);
 
