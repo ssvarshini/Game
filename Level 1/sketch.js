@@ -33,7 +33,7 @@ function setup() {
     // Create Scene, Boy, and Knight instances
     scene = new Scene(colors);
     boy = new Boy(253, 250, colors);
-    knight = new Knight(150, 150, colors);
+   knight = new Knight(150, 150, colors);
     
     // Initialize Orcs with fixed positions
     orcs.push(new Orc(300,700)); // Orc 1
@@ -66,7 +66,7 @@ function draw() {
     // Draw Scene, Boy, and Knight
     scene.draw();
     boy.draw();
-    knight.draw();
+    //knight.draw();
 
     // Draw all protein shakes
     for (let shake of proteinShakes) {
