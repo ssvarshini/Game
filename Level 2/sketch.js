@@ -95,6 +95,9 @@ function draw() {
     
     // Check for protein shake collection
     knight.checkCollection(proteinShakes);
+
+    //Wall collision
+    //knight.checkwallCollision(scene);
     
     // Draw life stages
     for (let i = 0; i < lifeStages.length; i++) {
@@ -342,7 +345,12 @@ class Knight {
         this.anchorY = this.startY;
     }
 
-   
+  /*  checkwallCollision(scene) {
+    let scaledX = this.anchorX * 0.5;
+    let scaledY = this.anchorY * 0.5;
+    let distance = dist(scaledX, scaledY, orc.orcX, orc.orcY);
+    return distance < 50;
+   } */
 
 } 
 
